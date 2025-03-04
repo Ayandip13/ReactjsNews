@@ -1,138 +1,147 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Card from "./Card";
 
 const Newsapp = () => {
+  const [search, setSearch] = useState("All");
+  const [newsData, setNewsData] = useState(null);
+
   const API_KEY = "f7e2bafc620c48abb4b8b8502c5c9513";
+
+  const handleInput = (e) => {
+    setSearch(e.target.value);
+  };
 
   const getData = async () => {
     const resp = await fetch(
-      `https://newsapi.org/v2/everything?q=football&apiKey=${API_KEY}`
+      `https://newsapi.org/v2/everything?q=${search}&apiKey=${API_KEY}`
     );
     const jsonData = await resp.json();
-    console.log(jsonData);
+    setNewsData(jsonData.articles);
+    console.log(jsonData.articles);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const handleCategoryClick = (e) => {
+    setSearch(e.target.value);
+    getData();
   };
 
   return (
-    <div>
+    <div style={{ backgroundColor: "#F5F5F5", minHeight: "100vh" }}>
+      {/* Navbar */}
       <nav
         style={{
-          backgroundColor: "#6A9C89",
+          backgroundColor: "#2C3E50",
           display: "flex",
-          height: 100,
+          height: 80,
           alignItems: "center",
-          justifyContent: "space-around",
-          padding: 10,
+          justifyContent: "space-between",
+          padding: "0 40px",
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <div>
-          <h1>Trendy News</h1>
-        </div>
-        <ul style={{ display: "flex", gap: 10, fontWeight: "bold" }}>
-          <a>All News</a>
-          <a>Trending News</a>
-        </ul>
-        <div className="searchBar">
+        <h1 style={{ fontSize: 36, color: "#FBFBFB", fontWeight: "bold" }}>
+          The Insider
+        </h1>
+
+        <div className="searchBar" style={{ display: "flex" }}>
           <input
             style={{
-              width: 250,
-              padding: 10,
-              fontSize: 18,
+              width: 280,
+              padding: 12,
+              fontSize: 16,
+              border: "none",
+              outline: "none",
               borderTopLeftRadius: 8,
               borderBottomLeftRadius: 8,
-              backgroundColor: "#D5E5D5",
+              backgroundColor: "#ECF0F1",
               textAlign: "center",
             }}
             type="text"
-            placeholder="Search News"
+            onChange={handleInput}
+            placeholder="Search News..."
+            value={search}
           />
           <button
             onClick={getData}
             style={{
-              fontSize: 18,
+              fontSize: 16,
               borderTopRightRadius: 8,
-              width: 80,
-              padding: 10,
               borderBottomRightRadius: 8,
-              backgroundColor: "#D5E5D5",
+              width: 100,
+              padding: 12,
+              backgroundColor: "#3498DB",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+              transition: "0.3s",
             }}
           >
             Search
           </button>
         </div>
       </nav>
+
+      {/* Subheading */}
       <div>
-        <p style={{ textAlign: "center", fontWeight: "500", fontSize: 20 }}>
+        <p
+          style={{
+            textAlign: "center",
+            fontWeight: "500",
+            fontSize: 22,
+            marginTop: 20,
+            color: "#34495E",
+          }}
+        >
           Stay Updated, Stay Refreshed
         </p>
       </div>
+
+      {/* Category Buttons */}
       <div
         className="categoryBtn"
-        style={{ display: "flex", gap: 45, justifyContent: "center" }}
+        style={{
+          display: "flex",
+          gap: 20,
+          justifyContent: "center",
+          marginTop: 15,
+          flexWrap: "wrap",
+        }}
       >
-        <button
-          style={{
-            width: 90,
-            height: 40,
-            backgroundColor: "#FFF5E4",
-            borderRadius: 7,
-            color: "#0D4715",
-            cursor: "pointer",
-          }}
-        >
-          Sports
-        </button>
-        <button
-          style={{
-            width: 90,
-            height: 40,
-            backgroundColor: "#FFF5E4",
-            borderRadius: 7,
-            color: "#0D4715",
-            cursor: "pointer",
-          }}
-        >
-          Politics
-        </button>
-        <button
-          style={{
-            width: 90,
-            height: 40,
-            backgroundColor: "#FFF5E4",
-            borderRadius: 7,
-            color: "#0D4715",
-            cursor: "pointer",
-          }}
-        >
-          Fun
-        </button>
-        <button
-          style={{
-            width: 90,
-            height: 40,
-            backgroundColor: "#FFF5E4",
-            borderRadius: 7,
-            color: "#0D4715",
-            cursor: "pointer",
-          }}
-        >
-          Health
-        </button>
-        <button
-          style={{
-            width: 90,
-            height: 40,
-            backgroundColor: "#FFF5E4",
-            borderRadius: 7,
-            cursor: "pointer",
-            color: "#0D4715",
-          }}
-        >
-          Fitness
-        </button>
+        {["Sports", "Politics", "Fun", "Health", "Fitness"].map((category) => (
+          <button
+            key={category}
+            style={{
+              width: 120,
+              height: 40,
+              backgroundColor: "#3498DB",
+              borderRadius: 7,
+              color: "#fff",
+              cursor: "pointer",
+              fontWeight: "bold",
+              border: "none",
+              fontSize: 16,
+              transition: "0.3s",
+            }}
+            onClick={handleCategoryClick}
+            value={category.toLowerCase()}
+            onMouseOver={(e) =>
+              (e.target.style.backgroundColor = "#2980B9")
+            }
+            onMouseOut={(e) =>
+              (e.target.style.backgroundColor = "#3498DB")
+            }
+          >
+            {category}
+          </button>
+        ))}
       </div>
-      <div>
-        <Card />
-      </div>
+
+      {/* News Cards */}
+      <div>{newsData ? <Card data={newsData} /> : null}</div>
     </div>
   );
 };
